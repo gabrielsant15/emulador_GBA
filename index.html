@@ -6,46 +6,29 @@
     <title>Emulador GBA</title>
     <style>
         body { background-color: #0a0a0a; color: #00ff00; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        #game-container { width: 800px; height: 600px; max-width: 95vw; border: 2px solid #00ff00; position: relative; background: #000; }
-        #game { width: 100%; height: 100%; }
-        .btn-load { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 15px 30px; background: #00ff00; color: #000; border: none; font-weight: bold; cursor: pointer; z-index: 100; }
+        #game-box { width: 800px; height: 600px; max-width: 95vw; border: 2px solid #00ff00; background: #000; position: relative; }
+        .instrucoes { color: #888; font-size: 12px; margin-top: 10px; }
+        #canvas { width: 100%; height: 100%; }
     </style>
 </head>
 <body>
 
-    <h1 style="text-shadow: 0 0 10px #00ff00;">EMULADOR GBA</h1>
+    <h1>EMULADOR GBA</h1>
 
-    <div id="game-container">
-        <button id="start-btn" class="btn-load" onclick="document.getElementById('file-input').click()">CARREGAR JOGO (.GBA)</button>
+    <div id="game-box">
         <div id="game"></div>
     </div>
 
-    <input type="file" id="file-input" accept=".gba" style="display:none">
+    <div class="instrucoes">Selecione o arquivo .gba | Teclas: Z, X, Enter, Shift</div>
 
     <script>
-        document.getElementById('file-input').onchange = function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('start-btn').style.display = 'none';
-                
-                // Configurações Globais
-                window.EJS_player = '#game';
-                window.EJS_core = 'gba';
-                window.EJS_startOnLoaded = true;
-                window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/';
-                
-                // Lendo o arquivo como ArrayBuffer (mais estável para o motor)
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    window.EJS_gameURL = event.target.result; 
-                    
-                    const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/loader.js';
-                    document.body.appendChild(script);
-                };
-                reader.readAsDataURL(file);
-            }
-        };
+        window.EJS_player = '#game';
+        window.EJS_core = 'gba';
+        window.EJS_pathtodata = 'https://rawcdn.githack.com/emulatorjs/emulatorjs/main/data/';
+        window.EJS_startOnLoaded = false; // Não inicia sozinho para não travar
+        window.EJS_language = 'pt-BR';
     </script>
+    <script src="https://rawcdn.githack.com/emulatorjs/emulatorjs/main/data/loader.js"></script>
+
 </body>
 </html>
