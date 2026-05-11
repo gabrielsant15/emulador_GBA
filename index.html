@@ -5,79 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emulador GBA</title>
     <style>
-        body { 
-            background-color: #0a0a0a; 
-            color: #00ff00; 
-            font-family: 'Courier New', Courier, monospace; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        h1 { text-shadow: 0 0 10px #00ff00; margin-bottom: 20px; }
-        
-        #game-container { 
-            width: 800px; 
-            height: 600px; 
-            max-width: 95vw; 
-            border: 2px solid #00ff00; 
-            position: relative; 
-            background: #000; 
-            box-shadow: 0 0 20px #004400; 
-        }
+        body { background-color: #0a0a0a; color: #00ff00; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        #game-container { width: 800px; height: 600px; max-width: 95vw; border: 2px solid #00ff00; position: relative; background: #000; }
         #game { width: 100%; height: 100%; }
-        
-        .btn-load { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            padding: 15px 30px; 
-            background: #00ff00; 
-            color: #000; 
-            border: none; 
-            font-weight: bold; 
-            cursor: pointer; 
-            z-index: 20; 
-            font-family: inherit;
-        }
-        .btn-load:hover { background: #00cc00; }
+        .btn-load { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 15px 30px; background: #00ff00; color: #000; border: none; font-weight: bold; cursor: pointer; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <h1>EMULADOR GBA</h1>
+    <h1 style="text-shadow: 0 0 10px #00ff00;">EMULADOR GBA</h1>
 
     <div id="game-container">
-        <button id="start-btn" class="btn-load" onclick="iniciar()">CARREGAR JOGO (.GBA)</button>
+        <button id="start-btn" class="btn-load" onclick="document.getElementById('file-input').click()">CARREGAR JOGO (.GBA)</button>
         <div id="game"></div>
     </div>
 
     <input type="file" id="file-input" accept=".gba" style="display:none">
 
     <script>
-        function iniciar() {
-            document.getElementById('file-input').click();
-        }
-
         document.getElementById('file-input').onchange = function(e) {
             const file = e.target.files[0];
             if (file) {
-                // Esconde o botão e prepara o emulador
                 document.getElementById('start-btn').style.display = 'none';
                 
+                // Configurações Globais
                 window.EJS_player = '#game';
                 window.EJS_core = 'gba';
-                window.EJS_gameUrl = URL.createObjectURL(file);
-                window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/';
                 window.EJS_startOnLoaded = true;
-
-                // Carrega o motor do emulador apenas após selecionar o arquivo
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/loader.js';
-                document.body.appendChild(script);
+                window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/';
+                
+                // Lendo o arquivo como ArrayBuffer (mais estável para o motor)
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    window.EJS_gameURL = event.target.result; 
+                    
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/loader.js';
+                    document.body.appendChild(script);
+                };
+                reader.readAsDataURL(file);
             }
         };
     </script>
