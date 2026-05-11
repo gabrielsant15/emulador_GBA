@@ -2,33 +2,48 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emulador GBA</title>
     <style>
-        body { background-color: #0a0a0a; color: #00ff00; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        #game-box { width: 800px; height: 600px; max-width: 95vw; border: 2px solid #00ff00; background: #000; position: relative; }
-        .instrucoes { color: #888; font-size: 12px; margin-top: 10px; }
-        #canvas { width: 100%; height: 100%; }
+        body { background: #000; color: #0f0; font-family: monospace; text-align: center; }
+        #game-container { width: 640px; height: 480px; max-width: 100%; margin: 20px auto; border: 2px solid #0f0; position: relative; }
+        #game { width: 100%; height: 100%; }
+        .controles { color: #555; font-size: 12px; }
+        #btn-select {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 20px; background: #0f0; color: #000; border: none; font-weight: bold; cursor: pointer; z-index: 99;
+        }
     </style>
 </head>
 <body>
 
-    <h1>EMULADOR GBA</h1>
+    <h1>GBA ONLINE</h1>
 
-    <div id="game-box">
+    <div id="game-container">
+        <button id="btn-select" onclick="document.getElementById('file-input').click()">CLIQUE AQUI PARA SELECIONAR O JOGO (.GBA)</button>
         <div id="game"></div>
     </div>
 
-    <div class="instrucoes">Selecione o arquivo .gba | Teclas: Z, X, Enter, Shift</div>
+    <input type="file" id="file-input" accept=".gba" style="display:none">
+
+    <p class="controles">Z: A | X: B | Enter: Start | Setas: Movimento</p>
 
     <script>
-        window.EJS_player = '#game';
-        window.EJS_core = 'gba';
-        window.EJS_pathtodata = 'https://rawcdn.githack.com/emulatorjs/emulatorjs/main/data/';
-        window.EJS_startOnLoaded = false; // Não inicia sozinho para não travar
-        window.EJS_language = 'pt-BR';
-    </script>
-    <script src="https://rawcdn.githack.com/emulatorjs/emulatorjs/main/data/loader.js"></script>
+        document.getElementById('file-input').onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('btn-select').style.display = 'none';
+                
+                window.EJS_player = '#game';
+                window.EJS_core = 'gba';
+                window.EJS_gameUrl = URL.createObjectURL(file);
+                window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/';
+                window.EJS_startOnLoaded = true;
 
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/loader.js';
+                document.body.appendChild(script);
+            }
+        };
+    </script>
 </body>
 </html>
