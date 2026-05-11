@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Emulador GBA Web</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #00ff00; /* Tom verde terminal */
+            font-family: monospace;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 5px; }
+        p { color: #cccccc; margin-bottom: 20px; }
+        
+        /* Container do Emulador */
+        #game-container {
+            width: 800px;
+            height: 600px;
+            max-width: 100%;
+            margin: 0 auto;
+            border: 2px solid #333;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>GBA Web Emulator</h1>
+    <p>Clique na pasta para carregar sua ROM de GBA. O progresso é salvo automaticamente!</p>
+
+    <!-- A div onde o jogo vai rodar -->
+    <div id="game-container">
+        <div id="game"></div>
+    </div>
+
+    <!-- Script de Configuração do Emulador -->
+    <script>
+        EJS_player = '#game';
+        EJS_core = 'gba'; // Define que o núcleo é de Game Boy Advance
+        EJS_color = '#00ff00'; // Cor dos menus internos do emulador
+        EJS_startOnLoaded = true; // Inicia assim que a ROM for carregada
+        EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'; // Puxa os arquivos WASM via CDN
+    </script>
+    
+    <!-- Carrega a biblioteca principal -->
+    <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+
+</body>
+</html>
