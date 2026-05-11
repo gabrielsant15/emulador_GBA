@@ -18,19 +18,8 @@
             overflow: hidden;
         }
 
-        h1 {
-            text-shadow: 0 0 10px #00ff00;
-            margin-bottom: 10px;
-            font-size: 1.5rem;
-        }
-
-        p {
-            color: #888;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-
-        /* Moldura do Emulador */
+        h1 { text-shadow: 0 0 10px #00ff00; margin-bottom: 10px; font-size: 1.5rem; }
+        
         #game-container {
             width: 800px;
             height: 600px;
@@ -39,43 +28,64 @@
             border: 3px solid #1a1a1a;
             border-radius: 8px;
             background-color: #000;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            position: relative;
         }
 
-        #game {
-            width: 100%;
-            height: 100%;
+        #game { width: 100%; height: 100%; }
+
+        /* Botão de carregar centralizado */
+        #controls {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
         }
 
-        .footer {
-            margin-top: 15px;
-            font-size: 0.7rem;
-            color: #444;
+        .btn-load {
+            background-color: #00ff00;
+            color: #000;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: monospace;
+            box-shadow: 0 0 15px #00ff00;
         }
+
+        .btn-load:hover { background-color: #00cc00; }
     </style>
 </head>
 <body>
 
     <h1>SISTEMA DE CAÇADOR - GBA</h1>
-    <p>Selecione sua ROM para iniciar a dungeon</p>
 
     <div id="game-container">
+        <div id="controls">
+            <input type="file" id="file-input" accept=".gba" style="display: none;">
+            <button class="btn-load" onclick="document.getElementById('file-input').click()">INICIAR DUNGEON (CARREGAR ROM)</button>
+        </div>
         <div id="game"></div>
     </div>
 
-    <div class="footer">
-        Desenvolvido por gabrielsant15 | Teclas: Z, X, Enter, Shift e Setas
-    </div>
-
     <script>
-        // Configurações Globais
         EJS_player = '#game';
         EJS_core = 'gba'; 
         EJS_color = '#00ff00'; 
         EJS_startOnLoaded = true;
-        
-        // Links estáveis para o Chrome rodar sem erro de rede
         EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/';
+
+        // Lógica para esconder o botão quando o jogo carregar
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('controls').style.display = 'none';
+                // O EmulatorJS vai detectar o arquivo automaticamente se você usar o loader padrão, 
+                // mas para garantir, vamos usar a função de carregar interna se necessário.
+                EJS_gameUrl = URL.createObjectURL(file);
+            }
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/loader.js"></script>
