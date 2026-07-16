@@ -2,43 +2,212 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Emulador GBA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA SPACE NEON :: Hyper Emulator</title>
     <style>
-        body { background: #000; color: #0f0; font-family: monospace; text-align: center; }
-        #game-container { width: 640px; height: 480px; max-width: 100%; margin: 20px auto; border: 2px solid #0f0; position: relative; }
-        #game { width: 100%; height: 100%; }
-        .controles { color: #555; font-size: 12px; }
+        /* --- ESTILOS GERAIS & TEMA ESPACIAL --- */
+        body {
+            background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
+            color: #0ff; /* Ciano Neon base */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            color: #b026ff; /* Roxo Neon Elétrico */
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #b026ff, 0 0 20px #b026ff, 0 0 40px #0ff;
+            animation: pulse-roxo 2s infinite alternate;
+            margin-bottom: 30px;
+        }
+
+        /* --- CONTAINER DO JOGO --- */
+        #game-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 4px solid #0ff;
+            box-shadow: 0 0 30px #0ff, 0 0 10px #b026ff, inset 0 0 20px #0ff;
+            border-radius: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 0;
+            padding-bottom: 75%; /* Proporção 4:3 para GBA */
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #game {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- BOTÃO DE SELECIONAR JOGO (ESTILO ELÉTRICO) --- */
+        #btn-select-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+        }
+
         #btn-select {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            padding: 20px; background: #0f0; color: #000; border: none; font-weight: bold; cursor: pointer; z-index: 99;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #0ff 0%, #b026ff 100%);
+            color: #000;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #0ff, 0 5px 0 #0aa;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        #btn-select:hover {
+            box-shadow: 0 0 30px #b026ff, 0 5px 0 #801acc;
+            transform: translateY(-2px);
+        }
+
+        #btn-select:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        .space-subtext {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* --- ÁREA DE CONTROLES E INFOS --- */
+        #controls-panel {
+            max-width: 800px;
+            margin: 20px auto;
+            border: 2px dashed #b026ff;
+            background: rgba(176, 38, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .control-item {
+            color: #0ff;
+            font-size: 14px;
+            text-shadow: 0 0 5px #0ff;
+            margin: 5px 15px;
+        }
+
+        .control-key {
+            display: inline-block;
+            background-color: #333;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #777;
+            font-family: monospace;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes pulse-roxo {
+            0% { opacity: 0.8; text-shadow: 0 0 10px #b026ff, 0 0 20px #b026ff; }
+            100% { opacity: 1; text-shadow: 0 0 20px #b026ff, 0 0 40px #0ff, 0 0 60px #b026ff; }
+        }
+
+        /* Partículas de fundo (estrelas) */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
 
-    <h1>GBA ONLINE</h1>
+    <!-- Fundo de Estrelas -->
+    <div id="stars"></div>
 
-    <div id="game-container">
-        <button id="btn-select" onclick="document.getElementById('file-input').click()">CLIQUE AQUI PARA SELECIONAR O JOGO (.GBA)</button>
-        <div id="game"></div>
+    <h1>GBA SPACE NEON</h1>
+
+    <!-- Invólucro do Jogo com Efeito de Borda Neon -->
+    <div id="game-wrapper">
+        <div id="game-container">
+            
+            <!-- Botão de Seleção (Sumiu o padrão horrível) -->
+            <div id="btn-select-wrapper">
+                <button id="btn-select" onclick="document.getElementById('file-input').click()">
+                    INICIAR MISSÃO (.GBA)
+                </button>
+                <span class="space-subtext">SELECIONE SUA ROM PARA VIAJAR</span>
+            </div>
+
+            <!-- Área onde o EmulatorJS vai carregar -->
+            <div id="game"></div>
+        </div>
     </div>
 
+    <!-- Entrada de arquivo escondida -->
     <input type="file" id="file-input" accept=".gba" style="display:none">
 
-    <p class="controles">Z: A | X: B | Enter: Start | Setas: Movimento</p>
+    <!-- Painel de Controles com Efeito Elétrico -->
+    <div id="controls-panel">
+        <div class="control-item"><span class="control-key">A</span> | <span class="control-key">Z</span></div>
+        <div class="control-item"><span class="control-key">B</span> | <span class="control-key">X</span></div>
+        <div class="control-item"><span class="control-key">L</span> | <span class="control-key">A</span></div>
+        <div class="control-item"><span class="control-key">R</span> | <span class="control-key">S</span></div>
+        <div class="control-item"><span class="control-key">START</span> | <span class="control-key">ENTER</span></div>
+        <div class="control-item"><span class="control-key">SELECT</span> | <span class="control-key">SHIFT</span></div>
+        <div class="control-item"><span class="control-key">MOVIMENTO</span> | <span class="control-key">SETAS</span></div>
+    </div>
 
     <script>
         document.getElementById('file-input').onchange = function(e) {
             const file = e.target.files[0];
             if (file) {
-                document.getElementById('btn-select').style.display = 'none';
+                // Esconde o botão de seleção
+                document.getElementById('btn-select-wrapper').style.display = 'none';
                 
+                // Configurações do EmulatorJS
                 window.EJS_player = '#game';
                 window.EJS_core = 'gba';
-                window.EJS_gameUrl = URL.createObjectURL(file);
+                window.EJS_gameUrl = URL.createObjectURL(file); // Carrega o arquivo local
                 window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/';
                 window.EJS_startOnLoaded = true;
 
+                // Carrega o script do emulador
                 const script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/gh/emulatorjs/emulatorjs@main/data/loader.js';
                 document.body.appendChild(script);
