@@ -199,21 +199,23 @@
 
     <script>
         document.getElementById('file-input').onchange = function(e) {
-            const file = e.target.files[0]; // Corrigido aqui: pegando o arquivo correto [0]
+            const file = e.target.files[0];
             if (file) {
                 // Esconde o botão de seleção
                 document.getElementById('btn-select-wrapper').style.display = 'none';
                 
-                // Configurações do EmulatorJS
+                // Configurações corrigidas do EmulatorJS
                 window.EJS_player = '#game';
                 window.EJS_core = 'gba';
                 window.EJS_gameUrl = URL.createObjectURL(file); 
-                window.EJS_pathtodata = 'https://jsdelivr.net'; // Atualizado para buscar a estável mais recente
+                
+                // Aponta para a pasta estável de dados do EmulatorJS
+                window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'; 
                 window.EJS_startOnLoaded = true;
 
-                // Carrega o script do emulador de forma limpa
+                // Carrega o script loader correto do CDN do EmulatorJS
                 const script = document.createElement('script');
-                script.src = 'https://jsdelivr.netloader.js';
+                script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
                 document.body.appendChild(script);
             }
         };
