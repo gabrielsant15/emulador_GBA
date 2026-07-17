@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GBA SPACE NEON :: Hyper Emulator</title>
+    
+    <!-- Configurações para PWA (Instalável no celular e notebook) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#001a33">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+    <link rel="icon" type="image/png" href="icon-96.png">
+
     <style>
         /* --- ESTILOS GERAIS & TEMA ESPACIAL --- */
         body {
@@ -44,9 +53,15 @@
             height: 0;
             padding-bottom: 75%; /* Proporção 4:3 para GBA */
             position: relative;
-            background: #000;
             border-radius: 10px;
             overflow: hidden;
+            
+            /* IMAGEM DE FUNDO DO EMULADOR (O SEU GBA NEON TOP) */
+            background-image: url('screenshot.png'); 
+            background-size: contain; /* Garante que o console apareça inteiro sem cortes */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #000; /* Preenche as laterais com preto se necessário */
         }
 
         #game {
@@ -55,6 +70,18 @@
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 10; /* Fica por cima do GBA de fundo quando o jogo iniciar */
+        }
+
+        /* Camada escura opcional para destacar os botões antes de carregar o jogo */
+        #bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4); /* Escurece de leve a imagem de fundo */
+            z-index: 1;
         }
 
         /* --- BOTÃO DE SELECIONAR JOGO (AZUL ELÉTRICO) --- */
@@ -94,11 +121,12 @@
         }
 
         .space-subtext {
-            color: rgba(0, 255, 255, 0.6);
+            color: rgba(0, 255, 255, 0.9);
             font-size: 14px;
             margin-top: 10px;
             display: block;
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 8px #000, 0 0 5px #0ff;
+            font-weight: bold;
         }
 
         /* --- ÁREA DE CONTROLES E INFOS --- */
@@ -169,6 +197,8 @@
     <!-- Invólucro do Jogo com Efeito de Borda Neon -->
     <div id="game-wrapper">
         <div id="game-container">
+            <!-- Camada de overlay escuro sobre a imagem -->
+            <div id="bg-overlay"></div>
             
             <!-- Botão de Seleção Azul -->
             <div id="btn-select-wrapper">
@@ -184,7 +214,7 @@
     </div>
 
     <!-- Entrada de arquivo escondida -->
-    <input type="file" id="file-input" accept=".gba" style="var(--display, none)">
+    <input type="file" id="file-input" accept=".gba" style="display: none;">
 
     <!-- Painel de Controles Azul Elétrico -->
     <div id="controls-panel">
@@ -198,22 +228,32 @@
     </div>
 
     <script>
+        // Registrar o Service Worker para habilitar o PWA (instalação offline)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PWA ativo com sucesso!', reg.scope))
+                    .catch(err => console.warn('Falha ao registrar PWA:', err));
+            });
+        }
+
         document.getElementById('file-input').onchange = function(e) {
             const file = e.target.files[0];
             if (file) {
-                // Esconde o botão de seleção
+                // Oculta o botão e o escurecimento do fundo para dar lugar à tela do jogo
                 document.getElementById('btn-select-wrapper').style.display = 'none';
+                document.getElementById('bg-overlay').style.display = 'none';
                 
-                // Configurações corrigidas do EmulatorJS
+                // Configurações do EmulatorJS
                 window.EJS_player = '#game';
                 window.EJS_core = 'gba';
                 window.EJS_gameUrl = URL.createObjectURL(file); 
                 
-                // Aponta para a pasta estável de dados do EmulatorJS
+                // Pasta de assets oficial do CDN
                 window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'; 
                 window.EJS_startOnLoaded = true;
 
-                // Carrega o script loader correto do CDN do EmulatorJS
+                // Carrega o loader do EmulatorJS
                 const script = document.createElement('script');
                 script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
                 document.body.appendChild(script);
