@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GBA SPACE NEON :: Hyper Emulator</title>
     
-    <!-- Configurações para PWA -->
+    <!-- CONFIGURAÇÕES CORRIGIDAS PARA O PWA (Agora com ./ de verdade) -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#001a33">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="./icon.png">
     <link rel="icon" type="image/png" href="./icon.png">
 
     <style>
-        /* ESTILOS GERAIS & TEMA NEON */
+        /* --- ESTILOS GERAIS & TEMA ESPACIAL --- */
         body {
-            background: radial-gradient(circle, #0b001a 0%, #000000 100%);
-            color: #00ffff; /* Ciano Neon */
+            background: radial-gradient(circle at center, #001a33 0%, #000000 100%);
+            color: #0ff; /* Ciano Neon base */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
             margin: 0;
@@ -26,67 +26,228 @@
         }
 
         h1 {
-            color: #00d2ff;
-            text-shadow: 0 0 10px #00d2ff, 0 0 20px #0088cc;
-            font-size: 2.5rem;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
+            color: #00d2ff; /* Azul Neon Elétrico */
             text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #00d2ff, 0 0 20px #00d2ff, 0 0 40px #0ff;
+            animation: pulse-azul 2s infinite alternate;
+            margin-bottom: 30px;
         }
 
-        /* Container do Emulador */
-        .emulator-container {
-            position: relative;
+        /* --- CONTAINER DO JOGO --- */
+        #game-wrapper {
             max-width: 800px;
             margin: 0 auto;
-            border: 4px solid #00ffff;
-            border-radius: 20px;
+            border: 4px solid #0ff;
+            box-shadow: 0 0 30px #0ff, 0 0 15px #00d2ff, inset 0 0 20px #0ff;
+            border-radius: 15px;
+            background-color: rgba(0, 0, 0, 0.85);
             padding: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 0 20px #00ffff, inset 0 0 15px #00ffff;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
-        /* Moldura de Tela */
-        .screen-frame {
-            background-color: #000;
+        #game-container {
+            width: 100%;
+            height: 0;
+            padding-bottom: 75%; /* Proporção 4:3 para GBA */
+            position: relative;
             border-radius: 10px;
             overflow: hidden;
-            border: 2px solid #ff00ff; /* Rosa Neon */
-            box-shadow: 0 0 15px #ff00ff;
-            aspect-ratio: 3 / 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            
+            /* IMAGEM DE FUNDO DO EMULADOR */
+            background-image: url('screenshot.png'); 
+            background-size: contain; 
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #000; 
         }
 
-        canvas {
+        #game {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
+            z-index: 10; 
+        }
+
+        /* Camada escura opcional */
+        #bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4); 
+            z-index: 1;
+        }
+
+        /* --- BOTÃO DE SELECIONAR JOGO (AZUL ELÉTRICO) --- */
+        #btn-select-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+            width: 90%;
+        }
+
+        #btn-select {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #00ffff 0%, #0055ff 100%);
+            color: #000;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #00ffff, 0 5px 0 #0044cc;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        #btn-select:hover {
+            box-shadow: 0 0 30px #00d2ff, 0 5px 0 #0033aa;
+            transform: translateY(-2px);
+        }
+
+        #btn-select:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .space-subtext {
+            color: rgba(0, 255, 255, 0.9);
+            font-size: 14px;
+            margin-top: 10px;
             display: block;
-            image-rendering: pixelated;
+            text-shadow: 0 0 8px #000, 0 0 5px #0ff;
+            font-weight: bold;
+        }
+
+        /* --- ÁREA DE CONTROLES E INFOS --- */
+        #controls-panel {
+            max-width: 800px;
+            margin: 20px auto;
+            border: 2px dashed #00d2ff;
+            background: rgba(0, 210, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.1);
+        }
+
+        .control-item {
+            color: #0ff;
+            font-size: 14px;
+            text-shadow: 0 0 5px #0ff;
+            margin: 5px 15px;
+        }
+
+        .control-key {
+            display: inline-block;
+            background-color: #001122;
+            color: #00ffff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #0055ff;
+            font-family: monospace;
+            font-weight: bold;
+            margin-right: 5px;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes pulse-azul {
+            0% { opacity: 0.8; text-shadow: 0 0 10px #00d2ff, 0 0 20px #00d2ff; }
+            100% { opacity: 1; text-shadow: 0 0 20px #00d2ff, 0 0 40px #0ff, 0 0 60px #0055ff; }
+        }
+
+        /* Partículas de fundo */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                radial-gradient(#e0ffff, rgba(0,255,255,.2) 2px, transparent 3px),
+                radial-gradient(#87ceeb, rgba(0,210,255,.15) 1px, transparent 2px),
+                radial-gradient(#00bfff, rgba(0,85,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body>
 
+    <div id="stars"></div>
+
     <h1>GBA SPACE NEON</h1>
 
-    <div class="emulator-container">
-        <div class="screen-frame">
-            <!-- Seu Canvas ou elemento do emulador aqui -->
-            <canvas id="emulator-canvas"></canvas>
+    <div id="game-wrapper">
+        <div id="game-container">
+            <div id="bg-overlay"></div>
+            
+            <div id="btn-select-wrapper">
+                <button id="btn-select" onclick="document.getElementById('file-input').click()">
+                    INICIAR MISSÃO (.GBA)
+                </button>
+                <span class="space-subtext">SELECIONE SUA ROM PARA VIAJAR</span>
+            </div>
+
+            <div id="game"></div>
         </div>
     </div>
 
+    <input type="file" id="file-input" accept=".gba" style="display: none;">
+
+    <div id="controls-panel">
+        <div class="control-item"><span class="control-key">A</span> | <span class="control-key">Z</span></div>
+        <div class="control-item"><span class="control-key">B</span> | <span class="control-key">X</span></div>
+        <div class="control-item"><span class="control-key">L</span> | <span class="control-key">A</span></div>
+        <div class="control-item"><span class="control-key">R</span> | <span class="control-key">S</span></div>
+        <div class="control-item"><span class="control-key">START</span> | <span class="control-key">ENTER</span></div>
+        <div class="control-item"><span class="control-key">SELECT</span> | <span class="control-key">SHIFT</span></div>
+        <div class="control-item"><span class="control-key">MOVIMENTO</span> | <span class="control-key">SETAS</span></div>
+    </div>
+
     <script>
-        // Registrar o Service Worker para o PWA funcionar offline
+        // Registrar o Service Worker para habilitar o PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('PWA ativo com sucesso! ', reg.scope))
-                    .catch(err => console.log('Falha ao registrar Service Worker: ', err));
+                    .then(reg => console.log('PWA ativo com sucesso!', reg.scope))
+                    .catch(err => console.warn('Falha ao registrar PWA:', err));
             });
         }
+
+        document.getElementById('file-input').onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('btn-select-wrapper').style.display = 'none';
+                document.getElementById('bg-overlay').style.display = 'none';
+                
+                window.EJS_player = '#game';
+                window.EJS_core = 'gba';
+                window.EJS_gameUrl = URL.createObjectURL(file); 
+                
+                window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'; 
+                window.EJS_startOnLoaded = true;
+
+                const script = document.createElement('script');
+                script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+                document.body.appendChild(script);
+            }
+        };
     </script>
 </body>
 </html>
