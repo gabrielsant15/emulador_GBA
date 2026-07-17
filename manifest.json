@@ -1,27 +1,18 @@
 {
+  "short_name": "GBA Neon",
   "name": "GBA Space Neon",
-  "short_name": "GBA Space",
-  "description": "Emulador de GBA Neon com tema Espacial",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "orientation": "landscape-primary",
-  "background_color": "#001a33",
-  "theme_color": "#00d2ff",
-  "lang": "pt-BR",
-  "scope": "./",
-  "categories": ["games", "entertainment"],
+  "description": "Emulador de Game Boy Advance com tema espacial neon.",
   "icons": [
     {
       "src": "./icon.png",
-      "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon.png",
       "sizes": "512x512",
-      "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0b001a",
+  "theme_color": "#00ffff",
+  "display": "standalone",
+  "orientation": "landscape"
 }
