@@ -1,22 +1,26 @@
-const CACHE_NAME = 'gba-space-v1';
+const CACHE_NAME = 'gba-space-v3';
+// Liste aqui EXATAMENTE os arquivos que você tem no seu GitHub
 const CACHE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './screenshot.png',
-  './icon-72.png',
-  './icon-96.png',
-  './icon-128.png',
-  './icon-144.png',
-  './icon-152.png',
-  './icon-192.png',
-  './icon-512.png'
+  './icon.png' // Certifique-se de que este arquivo existe na raiz
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(CACHE_ASSETS).catch(err => console.warn('Erro no cache offline:', err));
+      // Tenta adicionar os assets, mas não trava se um falhar
+      return Promise.allSettled(
+        CACHE_ASSETS.map(asset => cache.add(asset))
+      ).then(results => {
+        results.forEach((result, i) => {
+          if (result.status === 'rejected') {
+            console.warn(`Falha ao cachear asset: ${CACHE_ASSETS[i]}`, result.reason);
+          }
+        });
+      });
     }).then(() => self.skipWaiting())
   );
 });
